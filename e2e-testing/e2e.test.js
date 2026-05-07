@@ -99,40 +99,20 @@ describe("Demo Web Shop E2E tests", () => {
   });
 
   test("Open category and verify product list", async () => {
+    const page = await newPage();
 
-  const page = await newPage();
+    await page.goto(`${BASE_URL}/books`, {
+      waitUntil: "networkidle2",
+    });
 
-  // =========================
-  // 1. Go to Books category (stable page)
-  // =========================
-  await page.goto(`${BASE_URL}/books`, {
-    waitUntil: "networkidle2",
+    await page.waitForSelector(".product-item");
+    const products = await page.$$(".product-item");
+    expect(products.length).toBeGreaterThan(0);
+    await page.click(".product-title a");
+    await page.waitForSelector("h1");
+    const title = await page.$eval("h1", (el) => el.textContent);
+    expect(title.length).toBeGreaterThan(0);
+
+    await page.close();
   });
-
-  // =========================
-  // 2. Wait products
-  // =========================
-  await page.waitForSelector(".product-item");
-
-  // =========================
-  // 3. Check that products exist
-  // =========================
-  const products = await page.$$(".product-item");
-  expect(products.length).toBeGreaterThan(0);
-
-  // =========================
-  // 4. Open first product
-  // =========================
-  await page.click(".product-title a");
-
-  await page.waitForSelector("h1");
-
-  // =========================
-  // 5. Verify product page loaded
-  // =========================
-  const title = await page.$eval("h1", el => el.textContent);
-  expect(title.length).toBeGreaterThan(0);
-
-  await page.close();
-});
 });
